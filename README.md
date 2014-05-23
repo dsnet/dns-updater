@@ -70,6 +70,8 @@ mv *-dns-updater-* $SRC_ROOT
 
 # Update configuration file
 nano $SRC_ROOT/dns_updater.json
+chown root:root $SRC_ROOT/dns_updater.json
+chmod go-rwx $SRC_ROOT/dns_updater.json
 
 # Setup the daemon service
 ln -s $SRC_ROOT/dns_updater /etc/init.d/dns-updater
