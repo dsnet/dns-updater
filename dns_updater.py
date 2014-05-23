@@ -40,7 +40,6 @@ import pyrax
 # Regex patterns
 REGEX_ADDR = r'[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+'
 
-log_file = None
 domains = None
 sleep_event = threading.Event()
 terminate = False
@@ -50,13 +49,11 @@ terminate = False
 ############################### Helper functions ###############################
 ################################################################################
 
-def write_log(text):
-    """Write text to log"""
-    global log_file
+def print_log(text):
+    """Print text in log style"""
     timestamp = str(datetime.datetime.now())
     for line in text.split('\n'):
-        log_file.write("%s  %s\n" % (timestamp, line))
-    log_file.flush()
+        print "%s  %s" % (timestamp, line)
 
 
 def interrupt_handler(sig_num, frame):
@@ -97,10 +94,10 @@ def upsert_domain(domain, addr):
         rec = dns.find_record(domain, 'A', name = full_domain)
         if rec.data != addr:
             rec.update(data = addr)
-            write_log("Update record: %s -> %s" % (full_domain, addr))
+            print_log("Update record: %s -> %s" % (full_domain, addr))
     except pyrax.exceptions.DomainRecordNotFound:
         dns.add_record(domain, {'type': 'A', 'name': full_domain, 'data': addr})
-        write_log("Insert record: %s -> %s" % (full_domain, addr))
+        print_log("Insert record: %s -> %s" % (full_domain, addr))
 
 
 ################################################################################
@@ -108,8 +105,7 @@ def upsert_domain(domain, addr):
 ################################################################################
 
 if __name__ == "__main__":
-    log_file = open('/var/log/dns-updater.log', 'a')
-    write_log("Start daemon")
+    print_log("Start daemon")
 
     try:
         # Load the configuration file
@@ -141,7 +137,8 @@ if __name__ == "__main__":
         else:
             raise Exception("Invalid IP address source")
     except:
-        write_log(traceback.format_exc())
+        print_log(traceback.format_exc().strip())
+        print_log("Stop daemon")
         sys.exit(1)
 
     # Handle signals
@@ -155,9 +152,9 @@ if __name__ == "__main__":
             for dom in domains:
                 upsert_domain(dom, addr)
         except:
-            write_log(traceback.format_exc())
+            print_log(traceback.format_exc().strip())
 
         # Sleep rotation delay
         sleep_event.wait(poll_delay)
         sleep_event.clear()
-    write_log("Stop daemon")
+    print_log("Stop daemon")
