@@ -117,10 +117,7 @@ if __name__ == "__main__":
     (opts, args) = opts_parser.parse_args()
 
     # Start log file
-    if opts.log == '-':
-        log_file = sys.stdout
-    else:
-        log_file = open(opts.log, 'a')
+    log_file = sys.stdout if opts.log == '-' else open(opts.log, 'a')
     write_log("Start daemon")
 
     try:
