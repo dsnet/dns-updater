@@ -16,7 +16,7 @@ PID_FILE=/var/run/$NAME.pid
 LOG_FILE=/var/log/$NAME.log
 DAEMON_HOME=/usr/local/dns_updater
 DAEMON=$DAEMON_HOME/dns_updater.py
-DAEMON_OPTS=""
+DAEMON_OPTS="--log $LOG_FILE"
 DAEMON_USER=root
 
 # Pre-check
@@ -32,7 +32,7 @@ running() {
 
 start_server() {
 	echo "Starting $DESC:"
-	start-stop-daemon --start --quiet --pidfile $PID_FILE --make-pidfile --background --chuid $DAEMON_USER --startas $DAEMON -- $DAEMON_OPTS &>> $LOG_FILE && RET_CODE=0 || RET_CODE=$?
+	start-stop-daemon --start --quiet --pidfile $PID_FILE --make-pidfile --background --chuid $DAEMON_USER --startas $DAEMON -- $DAEMON_OPTS && RET_CODE=0 || RET_CODE=$?
 	if [ $RET_CODE -eq 0 ]; then
 		sleep 0.5
 		if running; then

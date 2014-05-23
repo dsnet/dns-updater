@@ -26,6 +26,7 @@ import sys
 import json
 import signal
 import urllib2
+import optparse
 import datetime
 import traceback
 import threading
@@ -40,6 +41,7 @@ import pyrax
 # Regex patterns
 REGEX_ADDR = r'[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+'
 
+log_file = None
 domains = None
 sleep_event = threading.Event()
 terminate = False
@@ -49,11 +51,12 @@ terminate = False
 ############################### Helper functions ###############################
 ################################################################################
 
-def print_log(text):
-    """Print text in log style"""
+def write_log(text):
+    """Write text to log file"""
     timestamp = str(datetime.datetime.now())
     for line in text.split('\n'):
-        print "%s  %s" % (timestamp, line)
+        log_file.write("%s  %s\n" % (timestamp, line))
+    log_file.flush()
 
 
 def interrupt_handler(sig_num, frame):
@@ -94,10 +97,10 @@ def upsert_domain(domain, addr):
         rec = dns.find_record(domain, 'A', name = full_domain)
         if rec.data != addr:
             rec.update(data = addr)
-            print_log("Update record: %s -> %s" % (full_domain, addr))
+            write_log("Update record: %s -> %s" % (full_domain, addr))
     except pyrax.exceptions.DomainRecordNotFound:
         dns.add_record(domain, {'type': 'A', 'name': full_domain, 'data': addr})
-        print_log("Insert record: %s -> %s" % (full_domain, addr))
+        write_log("Insert record: %s -> %s" % (full_domain, addr))
 
 
 ################################################################################
@@ -105,7 +108,20 @@ def upsert_domain(domain, addr):
 ################################################################################
 
 if __name__ == "__main__":
-    print_log("Start daemon")
+    # Parse cmdline arguments
+    opts_parser = optparse.OptionParser()
+    opts_parser.add_option(
+        '-l', '--log', default = '-',
+        help = "where to write the daemon log file",
+    )
+    (opts, args) = opts_parser.parse_args()
+
+    # Start log file
+    if opts.log == '-':
+        log_file = sys.stdout
+    else:
+        log_file = open(opts.log, 'a')
+    write_log("Start daemon")
 
     try:
         # Load the configuration file
@@ -137,8 +153,8 @@ if __name__ == "__main__":
         else:
             raise Exception("Invalid IP address source")
     except:
-        print_log(traceback.format_exc().strip())
-        print_log("Stop daemon")
+        write_log(traceback.format_exc().strip())
+        write_log("Stop daemon")
         sys.exit(1)
 
     # Handle signals
@@ -152,9 +168,9 @@ if __name__ == "__main__":
             for dom in domains:
                 upsert_domain(dom, addr)
         except:
-            print_log(traceback.format_exc().strip())
+            write_log(traceback.format_exc().strip())
 
         # Sleep rotation delay
         sleep_event.wait(poll_delay)
         sleep_event.clear()
-    print_log("Stop daemon")
+    write_log("Stop daemon")
