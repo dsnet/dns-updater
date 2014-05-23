@@ -19,7 +19,7 @@ This updater daemon can acquire the external IP address through two ways. The
 simplest way is to acquire the IP address by asking an external server via HTTP.
 The requirements are that the server replies back with just the address as the
 body contents. This acquisition method can be set by the following:
-```json
+```python
 "addr_src": {
     "type": "http",
     "url": "http://ipv4.dndy.me"
@@ -29,7 +29,7 @@ body contents. This acquisition method can be set by the following:
 Alternatively, the daemon can acquire the address by SSH-ing into the local
 router and then running ```ifconfig $IFACE``` to acquire the external address
 directly. This method can be used set by the following:
-```json
+```python
 "addr_src": {
     "type": "ssh-router",
     "iface": "vlan2",
@@ -39,6 +39,7 @@ directly. This method can be used set by the following:
     "key_file": "id_rsa"
 }
 ```
+
 The 'iface' parameter is the interface that the router uses to acquire its
 external IP address. In my case, this was 'vlan2'. The 'user' and 'host' fields
 are as one would expect for SSH. In order for SSH to work, either 'pass' or
