@@ -1,0 +1,13 @@
+{
+    "api_user": "nobody",
+    "api_key": "nokey",
+
+    "domains": ["example.com"],
+
+    "addr_src": {
+        "type": "http",
+        "url": "http://ipv4.dndy.me"
+    },
+
+    "poll_delay": 300
+}
