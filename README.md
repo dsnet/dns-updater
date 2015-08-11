@@ -62,7 +62,7 @@ su
 
 # Download the archive
 SRC_VERSION=tip
-curl http://code.digital-static.net/dns-updater/get/$SRC_VERSION.tar.gz | tar -zxv
+curl http://bitbucket.org/rawr/dns-updater/get/$SRC_VERSION.tar.gz | tar -zxv
 
 # Move local copy
 SRC_ROOT=/usr/local/dns_updater
