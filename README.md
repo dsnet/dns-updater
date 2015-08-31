@@ -61,12 +61,11 @@ relative to the location of daemon source directory.
 su
 
 # Download the archive
-SRC_VERSION=tip
-curl http://bitbucket.org/rawr/dns-updater/get/$SRC_VERSION.tar.gz | tar -zxv
+curl -L https://github.com/dsnet/dns-updater/archive/master.tar.gz | tar -zxv
 
 # Move local copy
 SRC_ROOT=/usr/local/dns_updater
-mv *-dns-updater-* $SRC_ROOT
+mv dns-updater-master $SRC_ROOT
 
 # Update configuration file
 nano $SRC_ROOT/dns_updater.json
